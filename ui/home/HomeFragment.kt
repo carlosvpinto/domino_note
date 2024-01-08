@@ -1,6 +1,7 @@
 package com.carlosvpinto.anotardomino.ui.home
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.media.AudioManager
@@ -32,6 +33,9 @@ import com.carlosvpinto.anotardomino.fragments.NombreJugadorFragment
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.widget.ImageButton
+import android.widget.ImageView
+import androidx.fragment.app.viewModels
 
 class HomeFragment : Fragment(){
 
@@ -39,6 +43,16 @@ class HomeFragment : Fragment(){
     private val PREFS_PUNTOS = "TotalFile"
     private val SELECTED_NUMBER = "selectedNumber"
     private var TotalGanar = 0
+    // Variables para almacenar el estado de los EditText y otros elementos
+    private var editTextValues1: Array<String?> = arrayOfNulls(15)
+    private var editTextValues2: Array<String?> = arrayOfNulls(15)
+    // Variables para almacenar el estado de los LinearLayout
+    private var linearLayoutVisibilities: BooleanArray = booleanArrayOf()
+
+    private val sharedViewModel: SharedViewModel by viewModels()
+
+
+
     private var _binding: FragmentHomeBinding? = null
 
 
@@ -88,22 +102,22 @@ class HomeFragment : Fragment(){
         R.id.txtMontoJugador2_14,
         R.id.txtMontoJugador2_15
     )
-    val arrayDeBotones1 = arrayOf(
-    R.id.btnEdit1_1,
-    R.id.btnEdit1_2,
-    R.id.btnEdit1_3,
-    R.id.btnEdit1_4,
-    R.id.btnEdit1_5,
-    R.id.btnEdit1_6,
-    R.id.btnEdit1_7,
-    R.id.btnEdit1_8,
-    R.id.btnEdit1_9,
-    R.id.btnEdit1_10,
-    R.id.btnEdit1_11,
-    R.id.btnEdit1_12,
-    R.id.btnEdit1_13,
-    R.id.btnEdit1_14,
-    R.id.btnEdit1_15
+    val BotonesElimIds = arrayOf(
+        R.id.imgEliminar,
+        R.id.imgEliminar2,
+        R.id.imgEliminar3,
+        R.id.imgEliminar4,
+        R.id.imgEliminar5,
+        R.id.imgEliminar6,
+        R.id.imgEliminar7,
+        R.id.imgEliminar8,
+        R.id.imgEliminar9,
+        R.id.imgEliminar10,
+        R.id.imgEliminar11,
+        R.id.imgEliminar12,
+        R.id.imgEliminar13,
+        R.id.imgEliminar14,
+        R.id.imgEliminar15
     )
     interface OnNumberEnteredListener {
         fun onNumberEntered(number: Int, fila: Int)
@@ -118,7 +132,7 @@ class HomeFragment : Fragment(){
         savedInstanceState: Bundle?,
     ): View {
         val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
+            ViewModelProvider(this).get(SharedViewModel::class.java)
         // Restaurar estados de visibilidad desde el savedInstanceState
         estadosVisibilidad = savedInstanceState?.getBooleanArray("estados_visibilidad") ?: booleanArrayOf()
 
@@ -152,84 +166,99 @@ class HomeFragment : Fragment(){
             llenarDatosFun(nombre, fila)
         }
         binding.btnAdd2.setOnClickListener {
+            val nombre = binding.fabjugador2.text.toString()
+            val fila = 2
+            llenarDatosFun(nombre, fila)
+        }
+        binding.txtTotal1.setOnClickListener {
+            val nombre = binding.fabjugador1.text.toString()
+            val fila = 1
+            llenarDatosFun(nombre, fila)
+        }
 
+        binding.txtTotal2.setOnClickListener {
             val nombre = binding.fabjugador2.text.toString()
             val fila = 2
             llenarDatosFun(nombre, fila)
         }
 
-        binding.btnQuitar.setOnClickListener {
-            EliminarUltimoLayout()
-            //reproduse Sonido Victoria
-            reproducirSonidoCorto(requireContext())
-        }
-        homeViewModel.text.observe(viewLifecycleOwner) {
-            //   textView.text = it
-        }
 
-//
-//        fun configurarListeners() {
-//            for (boton in arrayDeBotones1) {
-//                boton.setOnClickListener {
-//                    // Aquí puedes poner el código que deseas que se ejecute cuando se hace clic en el botón
-//                    // Por ejemplo, puedes mostrar un mensaje o realizar alguna acción específica.
-//                    mostrarMensaje("Se hizo clic en un botón.")
-//                }
-//            }
-//        }
 
         return root
 
     }
+
+
     fun getSelectedNumber(sharedPreferences: SharedPreferences): Int {
         return sharedPreferences.getInt(SELECTED_NUMBER, 75 )
     }
 
+//    //PARA RECUPERAR LOS DATOS CUANDO SE SALE DEL FRAGMNET********************
 //    override fun onSaveInstanceState(outState: Bundle) {
 //        super.onSaveInstanceState(outState)
-//        // Guardar el estado de visibilidad y los valores de texto de cada LinearLayout
-//        for (i in layoutIds.indices) {
-//            val layout = view?.findViewById<LinearLayout>(layoutIds[i])
-//            estadosVisibilidad[i] = layout?.visibility == View.VISIBLE
-//            val textView = view?.findViewById<TextView>(textosJgd1Ids[i])
-//            valoresText[i] = textView?.text?.toString()
+//        Log.d("LlenarDatos", "onSaveInstanceState: onSaveInstanceState ENTROOOO")
+//        // Guardar valores de los EditText
+//        for (i in 0 until 15) {
+//            val editText = view?.findViewById<TextView>(textosJgd1Ids[i])
+//            editTextValues1[i] = editText?.text.toString()
+//
 //        }
-//        // Guardar los arrays en el Bundle
-//        outState.putBooleanArray("estados_visibilidad", estadosVisibilidad)
-//        outState.putStringArray("valores_texto", valoresText)
+//
+//        // Guardar valores de los EditText
+//        for (i in 0 until 15) {
+//            val editText = view?.findViewById<TextView>(textosJgd2Ids[i])
+//            editTextValues2[i] = editText?.text.toString()
+//
+//        }
+//
+//        // Guardar el estado de visibilidad de los LinearLayout
+//        for (i in 0 until 15) {
+//            val linearLayout = view?.findViewById<LinearLayout>(layoutIds[i])
+//            linearLayoutVisibilities[i] = linearLayout?.visibility == View.VISIBLE
+//        }
+//
+//        // Guardar otros elementos visuales
+//        // Por ejemplo, si tienes elementos visuales adicionales, guárdalos aquí
+//
+//        outState.putStringArray("editTextValues1", editTextValues1)
+//        outState.putStringArray("editTextValues2", editTextValues2)
+//        outState.putBooleanArray("linearLayoutVisibilities", linearLayoutVisibilities)
 //    }
 //
-//    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-//        super.onViewStateRestored(savedInstanceState)
-//        // Restaurar el estado de visibilidad y los valores de texto después de que la vista se haya restaurado
-//        savedInstanceState?.let {
-//            estadosVisibilidad = it.getBooleanArray("estados_visibilidad") ?: BooleanArray(layoutIds.size)
-//            valoresText = it.getStringArray("valores_texto") ?: arrayOfNulls(layoutIds.size)
-//            // Actualizar la UI según sea necesario con los estados restaurados
-//            actualizarUIConEstadosDeVisibilidadYValoresText()
+//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+//        super.onViewCreated(view, savedInstanceState)
+//        Log.d("LlenarDatos", "onViewCreated: onViewCreated ENTROOOO")
+//        // Restaurar el estado de visibilidad de los LinearLayout
+//        val linearLayoutVisibilitiesSaved = savedInstanceState?.getBooleanArray("linearLayoutVisibilities")
+//        for (i in 0 until 15) {
+//            val linearLayout = view.findViewById<LinearLayout>(layoutIds[i])
+//            linearLayout?.visibility = if (linearLayoutVisibilitiesSaved?.get(i) == true) View.VISIBLE else View.GONE
 //        }
-//    }
 //
-//    private fun actualizarUIConEstadosDeVisibilidadYValoresText() {
-//        // Implementar la lógica para actualizar la visibilidad y los valores de texto de los LinearLayouts
-//        for (i in layoutIds.indices) {
-//            val layout = view?.findViewById<LinearLayout>(layoutIds[i])
-//            layout?.visibility = if (estadosVisibilidad[i]) View.VISIBLE else View.GONE
-//            val textView = view?.findViewById<TextView>(textosJgd1Ids[i])
-//            textView?.text = valoresText[i]
+//        // Restaurar valores de los EditText
+//        val editTextValuesSaved1 = savedInstanceState?.getStringArray("editTextValues1")
+//        val editTextValuesSaved2 = savedInstanceState?.getStringArray("editTextValues2")
+//        for (i in 0 until 15) {
+//            val editText = view.findViewById<TextView>(textosJgd1Ids[i])
+//            editText?.text=editTextValuesSaved1?.get(i)
 //        }
+//
+////         ... (otros códigos)
 //    }
+//********************************RECUPERA****************
+
+
 
     fun limpiartxt() {
 
 
         // Tu lógica para limpiar los textos y establecer la visibilidad en GONE
         // Asegúrate de que la vista esté adjunta antes de acceder a los elementos de vista
-        Log.d("LlenarDatos", "limpiartxt: Afuera del view?.let PASOOOO  nombre:layoutIds  $layoutIds")
+
         view?.let { view ->
             // Itera sobre los IDs de los layouts y establece la visibilidad en GONE
             for (layoutId in layoutIds) {
-                Log.d("LlenarDatos", "limpiartxt: Valor de layoutId $layoutId  nombre:layoutIds  $layoutIds")
+
                 val layout = view.findViewById<LinearLayout>(layoutId)
                 layout?.visibility = View.GONE
             }
@@ -251,6 +280,20 @@ class HomeFragment : Fragment(){
             binding.txtTotal2.text= "0"
         }
     }
+    private fun activarBtnEliminar() {
+        view?.let { view ->
+            // Itera sobre los IDs de los layouts y establece la visibilidad en GONE
+            for (botonId in BotonesElimIds) {
+                val botonElim = view.findViewById<ImageButton>(botonId)
+                botonElim?.setOnClickListener {
+                    EliminarUltimoLayout()
+                    //reproduse Sonido Victoria
+                    reproducirSonidoCorto(requireContext())
+                }
+            }
+        }
+    }
+
 
 
     private fun llenarDatosFun(nombre: String, fila: Int) {
@@ -363,7 +406,7 @@ class HomeFragment : Fragment(){
                 text2siguiente?.text = number.toString()
             }
 
-
+            activarBtnEliminar()
 
             totalizar()
 
@@ -411,7 +454,7 @@ class HomeFragment : Fragment(){
             } else {
                 Toast.makeText(
                     requireContext(),
-                    "Aprenda a JUGAR 15 partida para terminar... Fin DE LINEAS..",
+                    "Ya  JUGO 15 partida para terminar... Fin DE LINEAS..",
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -420,6 +463,7 @@ class HomeFragment : Fragment(){
     }
 
     private fun totalizar() {
+        var gano = false
        var Total2 = 0
        var Total = 0
         var ultimoVisible = 0
@@ -428,8 +472,9 @@ class HomeFragment : Fragment(){
             if (layout?.visibility == View.VISIBLE) {
                 val text1siguiente = view?.findViewById<TextView>(textosJgd1Ids[ultimoVisible])
                 val text2siguiente = view?.findViewById<TextView>(textosJgd2Ids[ultimoVisible])
-                var valor = text1siguiente?.text.toString().toInt()
-                var valor2 = text2siguiente?.text.toString().toInt()
+                var valor = text1siguiente?.text.toString().toIntOrNull() ?: 0
+                var valor2 = text2siguiente?.text.toString().toIntOrNull() ?: 0
+
                 Total2 += valor2
                 Total += valor
                 ultimoVisible = i
@@ -439,18 +484,26 @@ class HomeFragment : Fragment(){
         if (Total>=TotalGanar){
 
             val nuevoFragmento = FelicitacionesFragment()
-
+            limpiartxt()
             reemplazarFragmentEnContenedor(nuevoFragmento,Total,binding.fabjugador1.text.toString() )
+            gano= true
 
         }
         if (Total2>=TotalGanar){
-
+            limpiartxt()
             val nuevoFragmento = FelicitacionesFragment()
             reemplazarFragmentEnContenedor(nuevoFragmento,Total2,binding.fabjugador2.text.toString() )
+            gano= true
 
         }
-        binding.txtTotal1.text = Total.toString()
-        binding.txtTotal2.text = Total2.toString()
+        if (gano== true){
+            binding.txtTotal1.text = "0"
+            binding.txtTotal2.text = "0"
+        }else{
+            binding.txtTotal1.text = Total.toString()
+            binding.txtTotal2.text = Total2.toString()
+        }
+
 
     }
 

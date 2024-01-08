@@ -29,9 +29,8 @@ class FelicitacionesFragment : Fragment() {
 
 
     private val binding get() = _binding!!
-    private var nombre: String? = null
     private var fila: Int? = 0
-    private var monto = 0
+
 
 
     fun returnNombre(nombre:String, fila: Int) {
@@ -129,13 +128,4 @@ class FelicitacionesFragment : Fragment() {
 
 
 
-    // En el FelicitacionesFragment
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        val nuevoFragmento = HomeFragment()
-        if (nuevoFragmento.isAdded) {
-            nuevoFragmento.limpiartxt()
-        }
-    }
 }

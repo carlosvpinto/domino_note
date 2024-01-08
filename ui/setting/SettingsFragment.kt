@@ -15,7 +15,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.carlosvpinto.anotardomino.R
 import com.carlosvpinto.anotardomino.databinding.FragmentAcercaBinding
-import com.carlosvpinto.anotardomino.ui.home.HomeViewModel
+
+import com.carlosvpinto.anotardomino.ui.home.SharedViewModel
 
 class SettingsFragment : Fragment() {
 
@@ -31,7 +32,7 @@ class SettingsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
+            ViewModelProvider(this).get(SharedViewModel::class.java)
 
         _binding = FragmentAcercaBinding.inflate(inflater, container, false)
         val root: View = binding.root
